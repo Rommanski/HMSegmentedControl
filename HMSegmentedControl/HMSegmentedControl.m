@@ -331,8 +331,12 @@
             }
             titleLayer.string = [self attributedTitleAtIndex:idx];
             titleLayer.contentsScale = [[UIScreen mainScreen] scale];
-            
-            [self.scrollView.layer addSublayer:titleLayer];
+
+            if (nil != self.favoriteView && 0 == idx) {
+                [self.scrollView.layer addSublayer:[_favoriteView layer]];
+            } else {
+                [self.scrollView.layer addSublayer:titleLayer];
+            }
             
             // Vertical Divider
             if (self.isVerticalDividerEnabled && idx > 0) {
@@ -443,10 +447,14 @@
             } else {
                 imageLayer.contents = (id)icon.CGImage;
             }
-            
-            [self.scrollView.layer addSublayer:imageLayer];
-			titleLayer.contentsScale = [[UIScreen mainScreen] scale];
-            [self.scrollView.layer addSublayer:titleLayer];
+
+            if (nil != self.favoriteView && 0 == idx) {
+                [self.scrollView.layer addSublayer:[_favoriteView layer]];
+            } else {
+                [self.scrollView.layer addSublayer:imageLayer];
+                titleLayer.contentsScale = [[UIScreen mainScreen] scale];
+                [self.scrollView.layer addSublayer:titleLayer];
+            }
 			
             [self addBackgroundAndBorderLayerWithRect:imageRect];
         }];
@@ -640,6 +648,9 @@
             CGFloat stringWidth = [self measureTitleAtIndex:idx].width + self.segmentEdgeInset.left + self.segmentEdgeInset.right;
             [mutableSegmentWidths addObject:[NSNumber numberWithFloat:stringWidth]];
         }];
+        if (nil != _favoriteView) {
+            [mutableSegmentWidths setObject:[NSNumber numberWithDouble:_favoriteView.frame.size.width] atIndexedSubscript:0];
+        }
         self.segmentWidthsArray = [mutableSegmentWidths copy];
     } else if (self.type == HMSegmentedControlTypeImages) {
         for (UIImage *sectionImage in self.sectionImages) {
@@ -665,6 +676,9 @@
             
             [mutableSegmentWidths addObject:[NSNumber numberWithFloat:combinedWidth]];
         }];
+        if (nil != _favoriteView) {
+            [mutableSegmentWidths setObject:[NSNumber numberWithDouble:_favoriteView.frame.size.width] atIndexedSubscript:0];
+        }
         self.segmentWidthsArray = [mutableSegmentWidths copy];
     }
 
