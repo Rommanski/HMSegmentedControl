@@ -266,6 +266,10 @@
     }
 }
 
+-(NSInteger) indexOfFavorite {
+    return [[UIApplication sharedApplication]userInterfaceLayoutDirection] == UIUserInterfaceLayoutDirectionLeftToRight ? 0 : [_sectionTitles count] - 1;
+}
+
 - (void)drawRect:(CGRect)rect {
     [self.backgroundColor setFill];
     UIRectFill([self bounds]);
@@ -332,7 +336,12 @@
             titleLayer.string = [self attributedTitleAtIndex:idx];
             titleLayer.contentsScale = [[UIScreen mainScreen] scale];
 
-            if (nil != self.favoriteView && 0 == idx) {
+            if (nil != self.favoriteView && [self indexOfFavorite] == idx) {
+                _favoriteView.frame = CGRectMake(ceilf(rect.origin.x), 0.0, ceilf(rect.size.width), ceilf(rect.size.height));
+            }
+
+            if (nil != self.favoriteView && [self indexOfFavorite] == idx) {
+                NSLog(@"INDEX FAVORITE = %ld", (long)[self indexOfFavorite]);
                 [self.scrollView.layer addSublayer:[_favoriteView layer]];
             } else {
                 [self.scrollView.layer addSublayer:titleLayer];
@@ -428,6 +437,10 @@
             textRect = CGRectMake(ceilf(textRect.origin.x), ceilf(textRect.origin.y), ceilf(textRect.size.width), ceilf(textRect.size.height));
 
             CATextLayer *titleLayer = [CATextLayer layer];
+            if (nil != self.favoriteView && [self indexOfFavorite] == idx) {
+                _favoriteView.frame = textRect;
+            }
+
             titleLayer.frame = textRect;
             titleLayer.alignmentMode = kCAAlignmentCenter;
             titleLayer.string = [self attributedTitleAtIndex:idx];
@@ -448,7 +461,8 @@
                 imageLayer.contents = (id)icon.CGImage;
             }
 
-            if (nil != self.favoriteView && 0 == idx) {
+            if (nil != self.favoriteView && [self indexOfFavorite] == idx) {
+                NSLog(@"INDEX FAVORITE = %ld", (long)[self indexOfFavorite]);
                 [self.scrollView.layer addSublayer:[_favoriteView layer]];
             } else {
                 [self.scrollView.layer addSublayer:imageLayer];
@@ -649,7 +663,7 @@
             [mutableSegmentWidths addObject:[NSNumber numberWithFloat:stringWidth]];
         }];
         if (nil != _favoriteView) {
-            [mutableSegmentWidths setObject:[NSNumber numberWithDouble:_favoriteView.frame.size.width] atIndexedSubscript:0];
+            [mutableSegmentWidths setObject:[NSNumber numberWithDouble:_favoriteView.frame.size.width] atIndexedSubscript:[self indexOfFavorite]];
         }
         self.segmentWidthsArray = [mutableSegmentWidths copy];
     } else if (self.type == HMSegmentedControlTypeImages) {
@@ -677,7 +691,7 @@
             [mutableSegmentWidths addObject:[NSNumber numberWithFloat:combinedWidth]];
         }];
         if (nil != _favoriteView) {
-            [mutableSegmentWidths setObject:[NSNumber numberWithDouble:_favoriteView.frame.size.width] atIndexedSubscript:0];
+            [mutableSegmentWidths setObject:[NSNumber numberWithDouble:_favoriteView.frame.size.width] atIndexedSubscript:[self indexOfFavorite]];
         }
         self.segmentWidthsArray = [mutableSegmentWidths copy];
     }
